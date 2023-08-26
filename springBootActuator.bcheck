@@ -1,0 +1,44 @@
+metadata:
+    language: v1-beta
+    name: "Check for Spring Boot Actuator COPY"
+    description: "Checks if the Spring Boot Actuator is enabled"
+    author: "Mridul"
+    tags: "Spring Boot Actuator, Actuator"
+
+run for each:
+    potential_paths = 
+        "/actuator",
+        "/actuator/auditevents",
+        "/actuator/beans",
+        "/actuator/caches",
+        "/actuator/conditions",
+        "/actuator/configprops",
+        "/actuator/env",
+        "/actuator/flyway",
+        "/actuator/health",
+        "/actuator/heapdump",
+        "/actuator/httptrace",
+        "/actuator/info",
+        "/actuator/integrationgraph",
+        "/actuator/loggers",
+        "/actuator/liquibase",
+        "/actuator/metrics",
+        "/actuator/mappings",
+        "/actuator/prometheus",
+        "/actuator/scheduledtasks",
+        "/actuator/sessions",
+        "/actuator/shutdown",
+        "/actuator/threaddump"
+
+given request then
+    send request called check_actuator:
+        method: "GET"
+        path: {potential_paths}
+
+    if "\"_links\"" in {check_actuator.response.body} then
+        report issue:
+            severity: high
+            confidence: certain
+            detail: `Spring Boot Actuator is enabled at {potential_paths}.`
+            remediation: "Review and restrict access to sensitive Actuator endpoints."
+    end if
